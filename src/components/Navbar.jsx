@@ -1,26 +1,63 @@
-import React from "react";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
-    return (
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">Frontend App</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/register">Register</a>
-                    </li>
-                </ul>
-                </div>
-            </div>
-        </nav>
-    );
-}
+  const { user, logout } = useContext(AuthContext);
+
+  // Dynamically choose dashboard route
+  const getDashboardRoute = () => {
+    if (!user) return "/";
+    if (user.role === "admin") return "/admin/dashboard";
+    if (user.role === "organizer") return "/organizer/dashboard";
+    return "/attendee/dashboard";
+  };
+
+  return (
+    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+      <div className="container-fluid">
+
+        <Link className="navbar-brand" to="/">EMS</Link>
+
+        <div className="collapse navbar-collapse">
+          <ul className="navbar-nav ms-auto">
+
+            {!user && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">Login</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/register">Register</Link>
+                </li>
+              </>
+            )}
+
+            {user && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to={getDashboardRoute()}>
+                    Dashboard
+                  </Link>
+                </li>
+
+                <li className="nav-item">
+                  <button
+                    className="btn btn-link nav-link"
+                    onClick={logout}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            )}
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+};
 
 export default Navbar;
